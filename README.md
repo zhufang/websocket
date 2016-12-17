@@ -29,10 +29,58 @@ var xhr = new XMLHttpRequest();
         xhr.send();
     }
 
-send();
+>send();
 
 
+## 2. WebSocket
 >WebSocket是HTML5开始提供的一种浏览器与服务器间进行全双工通讯的网络技术
 使用WebSocket，浏览器和服务器只需要要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道，两者之间就直接可以数据互相传送
-节省资源：互相沟通的Header是很小的-大概只有 2 Bytes。
-推送信息：不需要客户端请求,服务器可以主动传送数据给客户端
+
+>节省资源：互相沟通的Header是很小的-大概只有 2 Bytes。
+>推送信息：不需要客户端请求,服务器可以主动传送数据给客户端
+
+## 3. WebSocket实现
+### 3.1 WebSocket服务器
+```
+var WebSocketServer = require('ws').Server;
+var wss = new WebSocketServer({port: 8080});
+//监听客户端的请求
+wss.on('connection', function (ws) {
+    //监听客户端的消息
+    ws.on('message', function(message) {
+        console.log('received: %s', message);
+        //向客户端发消息
+        ws.send('server hello');
+    });
+});
+```
+### 3.2 Node客户端
+```
+var WebSocket = require('ws');
+var ws = new WebSocket('ws://localhost:8080/');
+
+ws.on('open', function open() {
+    ws.send('hello world!');
+});
+
+ws.on('message', function(data, flags) {
+    console.log(data);
+    console.log('message ',data);
+});
+```
+
+### 3.3 网页客户端
+```
+//创建socket对象
+    var socket = new WebSocket('ws://localhost:8080/');
+    //监听连接事件
+    socket.onopen = function(){
+        //向服务器发送消息
+        socket.send('hello server');
+    }
+    //监听服务器端消息
+    socket.onmessage = function(event){
+        //输出服务器返回的消息
+        console.log(event.data);
+    }
+```
